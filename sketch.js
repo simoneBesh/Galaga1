@@ -1,12 +1,15 @@
 var player, playerImg;
 var enemy1, enemy2, enemy1Img, enemy2Img;
+var bullet, bulletImg;
+var enemyGroup,  bulletGroup;
 
 
 function preload(){
     playerImg = loadImage("galagaShip.png");
     enemy1Img = loadImage("enemy1.png");
     enemy2Img = loadImage("enemy2.png");
-    
+    bulletImg = loadImage("bullet.png");
+
 }
 
 function setup(){
@@ -16,11 +19,39 @@ function setup(){
     player.addImage("player", playerImg);
     player.scale = 0.1;
 
+    enemyGroup = new Group();
+    bulletGroup = new Group();
 
 }
 
 function draw(){
     background("black");
+
+    if(keyDown(LEFT_ARROW)){
+        player.velocityX=-10;
+        //bullet.velocityX = -10;
+    } 
+    if(keyDown(RIGHT_ARROW)){
+        player.velocityX=10;
+        //bullet.velocityX = 10;
+    }
+
+    if(player.x<0){
+        player.x = 1435;
+        bullet.x = 1435;
+    }
+    if(player.x>1440){
+        player.x = 5;
+        bullet.x = 5;
+    }
+
+    if(keyDown("space")){
+    fireBullet();
+    }
+
+    if(bulletGroup.isTouching(enemyGroup)){
+        enemyGroup.destroyEach();
+    }
 
 
 spawnEnemy();
@@ -28,18 +59,17 @@ spawnEnemy();
     drawSprites();
 }
 
-function keyPressed(){
-    if(keyCode===37){
-        player.x = player.x-15;
-    }
-    if(keyCode===39){
-        player.x = player.x+15;
-    }
+function fireBullet(){
+    bullet = createSprite(player.x, player.y - 30, 30, 30);
+    bullet.addImage("bullet", bulletImg);
+    bullet.scale = 0.07;
+    bullet.velocityY = -10;
+    bulletGroup.add(bullet);
 }
 
 function spawnEnemy(){
     //console.log(frameCount);
-    if(frameCount % 60 === 0){
+    if(frameCount % 10 === 0){
 
     var rand = Math.round (random(1,2));
     var randX = Math.round(random(50, 1400));
@@ -53,14 +83,18 @@ function spawnEnemy(){
         enemy1.scale = 0.1;
         enemy1.velocityY=randVy;
         enemy1.velocityX =randVx;
-
+        enemy1.lifetime = 100;
+        enemyGroup.add(enemy1);
     } else if(rand ===2){
         enemy2 = createSprite(randX, 200, 30, 30);
         enemy2.addImage("enemy2", enemy2Img);
         enemy2.scale = 0.07;
         enemy2.velocityY=randVy;
         enemy2.velocityX =randVx;
+        enemy2.lifetime = 100;
+        enemyGroup.add(enemy2);
     }
         
     }
+    
 }
